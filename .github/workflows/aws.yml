@@ -73,16 +73,16 @@ jobs:
         # be deployed to ECS.
         aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/u3p2w5n6
         docker build -t my-erc-repo .
-        docker tag my-erc-repo:latest public.ecr.aws/u3p2w5n6/my-erc-repo:latest
-        docker push public.ecr.aws/u3p2w5n6/my-erc-repo:latest
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+        docker tag my-erc-repo:latest public.ecr.aws/u3p2w5n6/my-erc-repo:$IMAGE_TAG
+        docker push public.ecr.aws/u3p2w5n6/my-erc-repo:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
     - name: Download task definition
       run: |
           aws ecs describe-task-definition --task-definition my-task-defination --query taskDefinition > task-definition.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
-      id: update-task-def
+      id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
@@ -90,10 +90,9 @@ jobs:
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
-      id: deploy-task-def
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1 
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: task-definition.json
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ secrets.ECS_SERVICE }}
+        cluster: ${{ secrets.ECS_CLUSTER }}
         wait-for-service-stability: true
