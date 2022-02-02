@@ -36,7 +36,7 @@ env:
   ECR_REPOSITORY: my-erc-repo         # set this to your Amazon ECR repository name
   ECS_SERVICE: ashik-test                 # set this to your Amazon ECS service name
   ECS_CLUSTER: ashik-cluster                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ../workflows/aws-task-definition.json  # set this to the path to your Amazon ECS task definition
+  ECS_TASK_DEFINITION: ../../aws-task-definition.json  # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: my-erc-repo          # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
@@ -81,7 +81,7 @@ jobs:
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ecs-task-definition.json
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
