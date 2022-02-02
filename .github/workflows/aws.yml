@@ -75,7 +75,7 @@ jobs:
         docker build -t my-erc-repo .
         docker tag my-erc-repo:latest public.ecr.aws/u3p2w5n6/my-erc-repo:latest
         docker push public.ecr.aws/u3p2w5n6/my-erc-repo:latest
-        #echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
